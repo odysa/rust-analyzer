@@ -1297,7 +1297,6 @@ impl<'db> SemanticsImpl<'db> {
     ) -> Option<SourceAnalyzer> {
         let _p = tracing::span!(tracing::Level::INFO, "Semantics::analyze_impl");
         let node = self.find_file(node);
-
         let container = self.with_ctx(|ctx| ctx.find_container(node))?;
 
         let resolver = match container {

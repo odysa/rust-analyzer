@@ -404,7 +404,6 @@ pub fn search_dependencies(
 
     let import_maps: Vec<_> =
         graph[krate].dependencies.iter().map(|dep| db.import_map(dep.crate_id)).collect();
-
     let mut op = fst::map::OpBuilder::new();
 
     match query.search_mode {
@@ -447,7 +446,6 @@ fn search_maps(
             let start = (value >> 32) as usize;
             let ImportMap { item_to_info_map, importables, .. } = &*import_maps[import_map_idx];
             let importables = &importables[start..end];
-
             let iter = importables
                 .iter()
                 .copied()

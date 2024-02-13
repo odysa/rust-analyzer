@@ -200,10 +200,10 @@ pub(super) fn find_importable_node(
             .zip(Some(method_under_caret.syntax().clone().into()))
     } else if ctx.find_node_at_offset_with_descend::<ast::Param>().is_some() {
         None
-    } else if let Some(pat) = ctx
-        .find_node_at_offset_with_descend::<ast::IdentPat>()
-        .filter(ast::IdentPat::is_simple_ident)
-    {
+    } else if let Some(pat) = {
+        ctx.find_node_at_offset_with_descend::<ast::IdentPat>()
+            .filter(ast::IdentPat::is_simple_ident)
+    } {
         ImportAssets::for_ident_pat(&ctx.sema, &pat).zip(Some(pat.syntax().clone().into()))
     } else {
         None
@@ -469,6 +469,46 @@ mod baz {
             }
             ",
         );
+    }
+
+    #[test]
+    fn test_rhai() {
+        check_assist(
+            auto_import,
+            r"
+            $0Base
+
+            mod PubMod {
+                mod M {
+                    pub use BaseMod::Base as PubStruct;
+                }
+                pub use M::PubStruct;
+            }
+            mod std {
+                pub mod Cell{
+                    pub struct Base;
+                }
+            }
+            ",
+            r"
+            use std::Base;
+
+            Base
+
+            mod PubMod {
+                mod M {
+                    pub use BaseMod::Base as PubStruct;
+                }
+                pub use M::PubStruct;
+            }
+            mod std {
+                mod Cell{
+                    pub struct Base;
+                }
+                pub mod Cell;
+            }
+            ",
+        )
     }
 
     #[test]

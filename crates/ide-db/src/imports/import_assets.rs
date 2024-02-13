@@ -282,12 +282,16 @@ impl ImportAssets {
             )
             .filter(|path| path.len() > 1)
         };
-
         match &self.import_candidate {
             ImportCandidate::Path(path_candidate) => {
-                path_applicable_imports(sema, krate, path_candidate, mod_path, |item_to_import| {
-                    !scope_definitions.contains(&ScopeDef::from(item_to_import))
-                })
+                let res = path_applicable_imports(
+                    sema,
+                    krate,
+                    path_candidate,
+                    mod_path,
+                    |item_to_import| !scope_definitions.contains(&ScopeDef::from(item_to_import)),
+                );
+                res
             }
             ImportCandidate::TraitAssocItem(trait_candidate)
             | ImportCandidate::TraitMethod(trait_candidate) => trait_applicable_items(
